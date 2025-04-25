@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",        // Use ESNext module system
+    "target": "ES2020",        // Use modern JavaScript features
+    "moduleResolution": "node", // Resolve modules like Node.js
+    "esModuleInterop": true,   // Allows default imports from CommonJS
+    "skipLibCheck": true,      // Skip type checking of declaration files
+    "strict": true,            // Enable strict type-checking options
+    "resolveJsonModule": true  // Allow importing JSON files as modules
+  },
+  "include": [
+    "e2e/**/*.ts"              // Include your TypeScript test files
+  ],
+  "exclude": [
+    "node_modules"             // Exclude node_modules
+  ]
+}

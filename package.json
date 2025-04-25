@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "e2e": "node --loader ts-node/esm start.js"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^7.0.4",
+    "puppeteer": "^24.7.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "type": "module"
+}
