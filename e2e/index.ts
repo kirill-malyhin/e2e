@@ -1,4 +1,4 @@
-import puppeteer, { Page } from 'puppeteer';
+import puppeteer, {Page} from 'puppeteer';
 
 const APPLICATION_URL: string = 'https://app.refty.ai/';
 const ACCOUNT_EMAIL: string = 'refty.e2e.test@gmail.com'
@@ -38,7 +38,7 @@ const googleLogin = async (page: Page): Promise<void> => {
   const continueButtons = await page.$$('button');
   for (const btn of continueButtons) {
     const text = await page.evaluate(el => el.textContent, btn);
-    if (text?.includes("Continue")) {
+    if (text?.includes('Continue')) {
       await btn.click();
       break;
     }
@@ -49,6 +49,58 @@ const googleLogin = async (page: Page): Promise<void> => {
 const validatePrice = async (page: Page): Promise<void> => {
   await page.waitForSelector('.grid', { timeout: 60000 });
   console.log('Properties loaded successfully!');
+
+  // for some reason there are two exactly the same buttons on the page, and only one is visible and clickable.
+  // for production usage must be a dedicated selector.
+  const filterBtnSelector = 'button.bg-gray-100.text-black.py-3.px-6.rounded-lg.flex.items-center.justify-center.shadow-md';
+  const filterButtons = await page.$$(filterBtnSelector)
+  await filterButtons[1]?.click();
+
+  const minPriceSelector = 'input[placeholder="Min"]';
+  await page.waitForSelector(minPriceSelector);
+  await page.type(minPriceSelector, '1000000');
+
+  // primary buttons like 'Apply' action must have unique selector
+  const buttons = await page.$$('button.bg-gray-100');
+  for (let button of buttons) {
+    const text = await page.evaluate(button => button?.querySelector('span')?.textContent?.trim(), button);
+    if (text === 'Apply') {
+      await button.click();
+      console.log('"Apply" button clicked.');
+      break;
+    }
+  }
+
+  // wait for the properties to reload after setting the min price filter
+  await new Promise(resolve => setTimeout(resolve, 7000));
+
+  // price should have its own selector
+  const priceSelectors = await page.$$eval('div.p-4 p.text-xl.font-bold.text-gray-900', priceElements => {
+    return priceElements.map(el => el?.textContent?.trim());
+  });
+
+  const prices = priceSelectors.map(el => el?.replace(/[^\d]/g, '') || '')
+
+  console.log('Prices:', prices);
+
+  // this code works only with items, which are currently visible on the screen. As application has lazy loading, production solution should be different
+  let allPricesValid = true;
+
+  for (const priceStr of prices) {
+    const price = parseInt(priceStr, 10);
+    if (price > 1000000) {
+      console.error(`❌ Property with price over 1M AED found: ${price}`);
+      allPricesValid = false;
+    } else {
+      console.log(`✅ Property with price ${price} AED passed filter`);
+    }
+  }
+
+  if (allPricesValid) {
+    console.log('All properties are within the 1M AED price filter.');
+  } else {
+    console.log('Some properties exceed the 1M AED price filter.');
+  }
 }
 
 (async () => {
