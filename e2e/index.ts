@@ -26,7 +26,7 @@ const googleLogin = async (page: Page): Promise<void> => {
     await continueButton.click();
   }
 
-  // Step 3: Handle Google login (login credentials)
+  // Handle Google login (login credentials)
   console.log(`Logging in with ${ACCOUNT_EMAIL}...`);
   await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
@@ -40,7 +40,7 @@ const googleLogin = async (page: Page): Promise<void> => {
   await page.type('input[type="password"]', getGooglePassword());
   await page.click('#passwordNext');
 
-  // Step 4: Wait for the "Continue" button on Google
+  // Wait for the "Continue" button on Google
   await page.waitForSelector('button', { visible: true });
   const continueButtons = await page.$$('button');
   for (const btn of continueButtons) {
