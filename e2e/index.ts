@@ -86,20 +86,21 @@ const validatePrice = async (page: Page): Promise<void> => {
   // this code works only with items, which are currently visible on the screen. As application has lazy loading, production solution should be different
   let allPricesValid = true;
 
+  // task: Set min price 1M AED and verify that properties do not have prices over
   for (const priceStr of prices) {
     const price = parseInt(priceStr, 10);
-    if (price > 1000000) {
-      console.error(`❌ Property with price over 1M AED found: ${price}`);
-      allPricesValid = false;
-    } else {
+    if (price === 1000000) {
       console.log(`✅ Property with price ${price} AED passed filter`);
+    } else {
+      console.error(`❌ Property with price not equal 1M AED found: ${price}`);
+      allPricesValid = false;
     }
   }
 
   if (allPricesValid) {
-    console.log('All properties are within the 1M AED price filter.');
+    console.log('All properties are equal to 1M AED price filter.');
   } else {
-    console.log('Some properties exceed the 1M AED price filter.');
+    console.log('Some properties not equal to the 1M AED price filter.');
   }
 }
 
